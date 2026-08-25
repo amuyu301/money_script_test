@@ -297,6 +297,25 @@
       color: var(--muted);
     }
 
+    .score-guide {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+
+    .score-guide p:last-child { margin-bottom: 0; }
+
+    .perspective-note {
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 3px solid var(--primary);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
     .warning {
       margin-top: 10px;
       padding: 12px 14px;
@@ -333,13 +352,6 @@
       <h1>マネースクリプト・テスト</h1>
       <p>32問の質問に、<strong>1〜6点</strong>で答える自己診断テストです。すべて回答すると、4つの傾向を自動で集計して表示します。</p>
       <p class="muted">点数の意味：1＝完全に反対、2＝反対、3＝少し反対、4＝少し賛成、5＝賛成、6＝完全に賛成</p>
-
-      <div class="legend">
-        <div class="legend-item"><strong>金銭忌避</strong><br>お金に対する罪悪感や拒否感の傾向</div>
-        <div class="legend-item"><strong>金銭崇拝</strong><br>お金が幸せや解決をもたらすと考える傾向</div>
-        <div class="legend-item"><strong>金銭地位</strong><br>お金を成功や価値の指標として見る傾向</div>
-        <div class="legend-item"><strong>金銭警戒</strong><br>支出に慎重で、貯蓄や不安が強くなりやすい傾向</div>
-      </div>
 
       <div class="progress-wrap">
         <div class="progress-info">
@@ -497,7 +509,7 @@
       return ['傾向がとても高い', '貯蓄意識が強すぎて、人生の楽しみに支障が出ることがあります。', 'level-very-high'];
     }
 
-    function resultCard(title, score, range, judgment) {
+    function resultCard(title, score, judgment, scoreGuide, reflection, perspective) {
       const [level, desc, cls] = judgment;
       return `
         <section class="result-card">
@@ -507,7 +519,11 @@
             <div class="num">${score}点</div>
           </div>
           <p>${desc}</p>
-          <p class="mini-note">判定範囲：${range}</p>
+          <div class="score-guide">
+            <p><strong>点数の見方</strong><br>${scoreGuide}</p>
+            <p><strong>振り返りのポイント</strong><br>${reflection}</p>
+          </div>
+          <p class="perspective-note">${perspective}</p>
         </section>
       `;
     }
@@ -527,10 +543,48 @@
       const vigilance = sumRange(answers, 25, 32);
 
       resultSection.innerHTML = `
-        ${resultCard('金銭忌避', avoidance, '9〜18 / 19〜27 / 28〜36 / 37〜54', judgeAvoidance(avoidance))}
-        ${resultCard('金銭崇拝', worship, '7〜14 / 15〜30 / 31〜38 / 39〜49', judgeWorship(worship))}
-        ${resultCard('金銭地位', status, '8〜16 / 17〜24 / 25〜32 / 33〜48', judgeStatus(status))}
-        ${resultCard('金銭警戒', vigilance, '8〜16 / 17〜24 / 25〜32 / 33〜48', judgeVigilance(vigilance))}
+        ${resultCard(
+          '金銭危機',
+          avoidance,
+          judgeAvoidance(avoidance),
+          '9〜18点は傾向なし、19〜27点はややあり、28〜36点は高い、37〜54点はとても高いとされます。',
+          '高い場合は、お金の相談や家計の現実を避けていないか、過剰な出費や衝動的な買い物につながっていないかを確認します。目安として、19〜27点、さらに25点以下に抑える考え方があります。',
+          '低ければ低いほど良いとされます。'
+        )}
+        ${resultCard(
+          '金銭崇拝',
+          worship,
+          judgeWorship(worship),
+          '7〜14点は傾向なし、15〜30点はややあり、31〜38点は高い、39〜49点はとても高いとされます。',
+          '点数が高い場合は、お金を稼ぐことのために仕事と生活のバランス、健康、家庭を犠牲にしていないか、経済状況を無視した支出をしていないかを振り返ります。',
+          '無さすぎると、お金を稼ごうとする気力が生まれにくいとされます。'
+        )}
+        ${resultCard(
+          '金銭地位',
+          status,
+          judgeStatus(status),
+          '8〜16点は傾向なし、17〜24点はややあり、25〜32点は高い、33〜48点はとても高いとされます。',
+          '高い場合は、ブランド品や高価な物を楽しみのためではなく、他人より上に見せるために買っていないか、見栄のために借金をしていないかを確認します。',
+          '低ければ低いほど良いとされます。'
+        )}
+        ${resultCard(
+          '金銭警戒',
+          vigilance,
+          judgeVigilance(vigilance),
+          '8〜16点は傾向なし、17〜24点はややあり、25〜32点は高い、33〜48点はとても高いとされます。',
+          '高すぎる場合は、自己投資や必要な支出、人間関係、パートナーへの贈り物、子どもへの投資まで抑えていないかを振り返ります。目先の節約だけでなく、時間も含めた全体の得を考えます。',
+          '低すぎると、お金を使いすぎてしまうことがあります。'
+        )}
+        <section class="result-card">
+          <h2>4つのマネースクリプト</h2>
+          <p class="muted">回答前には表示していなかった各分類の概要です。結果とあわせてご覧ください。</p>
+          <div class="legend">
+            <div class="legend-item"><strong>金銭危機</strong><br>お金に対する罪悪感や拒否感の傾向</div>
+            <div class="legend-item"><strong>金銭崇拝</strong><br>お金が幸せや解決をもたらすと考える傾向</div>
+            <div class="legend-item"><strong>金銭地位</strong><br>お金を成功や価値の指標として見る傾向</div>
+            <div class="legend-item"><strong>金銭警戒</strong><br>支出に慎重で、貯蓄や不安が強くなりやすい傾向</div>
+          </div>
+        </section>
         <section class="result-card">
           <h2>見方</h2>
           <p>このテストは、金銭に対する考え方の偏りを見つけるための自己診断です。病気や障害を診断するものではありません。</p>
